@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>블라인드 타이핑 - 관전</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container spectator-view">
+        <div class="header">
+            <h1>블라인드 타이핑 - 관전 모드</h1>
+            <p class="nickname"><span id="role-badge"></span> <span id="my-nickname"></span></p>
+        </div>
+
+        <div id="admin-controls" class="admin-controls hidden">
+            <h3>게임 컨트롤</h3>
+            <div class="control-buttons">
+                <select id="language-select">
+                    <option value="korean">한글</option>
+                    <option value="english">영어</option>
+                    <option value="mixed">혼합</option>
+                </select>
+                <button class="btn btn-primary" onclick="startGame()">게임 시작</button>
+                <button class="btn btn-secondary" onclick="resetGame()">리셋</button>
+            </div>
+        </div>
+
+        <div class="game-status">
+            <div class="status-badge" id="game-state">대기 중</div>
+            <div id="sentence-display" class="sentence-display hidden">
+                <h3>현재 문장</h3>
+                <p id="current-sentence" class="target-sentence"></p>
+            </div>
+        </div>
+
+        <div class="players-grid" id="players-grid">
+            <!-- 플레이어 카드들이 여기에 동적으로 추가됨 -->
+        </div>
+
+        <div id="winner-banner" class="winner-banner hidden">
+            <h2>🎉 우승자: <span id="winner-name"></span></h2>
+            <p>소요 시간: <span id="winner-time"></span>초</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+    <script src="/static/js/spectator.js"></script>
+</body>
+</html>

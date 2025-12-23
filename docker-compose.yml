@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  blind-typing:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - ADMIN_PASSWORD=fancypassword123
+    volumes:
+      - ./app:/app/app
+    restart: unless-stopped

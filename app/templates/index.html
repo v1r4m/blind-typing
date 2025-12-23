@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>블라인드 타이핑 게임</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>블라인드 타이핑 게임</h1>
+        <p class="subtitle">눈을 가리고 타자치기 대결!</p>
+
+        <div class="lobby-box">
+            <div class="form-group">
+                <label for="nickname">닉네임</label>
+                <input type="text" id="nickname" placeholder="닉네임을 입력하세요" maxlength="20">
+            </div>
+
+            <div class="role-buttons">
+                <button class="btn btn-primary" onclick="joinAs('player')">
+                    플레이어로 참가
+                </button>
+                <button class="btn btn-secondary" onclick="joinAs('spectator')">
+                    관전하기
+                </button>
+                <button class="btn btn-admin" onclick="showAdminLogin()">
+                    어드민
+                </button>
+            </div>
+
+            <div id="admin-login" class="admin-login hidden">
+                <div class="form-group">
+                    <label for="admin-password">어드민 비밀번호</label>
+                    <input type="password" id="admin-password" placeholder="비밀번호 입력">
+                </div>
+                <button class="btn btn-admin" onclick="joinAs('admin')">
+                    어드민으로 접속
+                </button>
+            </div>
+
+            <div id="error-message" class="error-message hidden"></div>
+        </div>
+
+        <div class="room-status">
+            <h3>현재 대기실</h3>
+            <p>플레이어: <span id="player-count">0</span>/4</p>
+            <p>관전자: <span id="spectator-count">0</span></p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        socket.on('connect', () => {
+            socket.emit('get_room_info');
+        });
+
+        socket.on('room_update', (data) => {
+            document.getElementById('player-count').textContent = data.player_count;
+            document.getElementById('spectator-count').textContent = data.spectator_count;
+        });
+
+        socket.on('joined', (data) => {
+            if (data.success) {
+                sessionStorage.setItem('nickname', data.nickname);
+                sessionStorage.setItem('role', data.role);
+
+                if (data.role === 'player') {
+                    window.location.href = '/player';
+                } else {
+                    window.location.href = '/spectator';
+                }
+            }
+        });
+
+        socket.on('error', (data) => {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = data.message;
+            errorEl.classList.remove('hidden');
+            setTimeout(() => errorEl.classList.add('hidden'), 3000);
+        });
+
+        function showAdminLogin() {
+            document.getElementById('admin-login').classList.toggle('hidden');
+        }
+
+        function joinAs(role) {
+            const nickname = document.getElementById('nickname').value.trim();
+            if (!nickname) {
+                alert('닉네임을 입력해주세요!');
+                return;
+            }
+
+            const data = { nickname, role };
+
+            if (role === 'admin') {
+                data.password = document.getElementById('admin-password').value;
+            }
+
+            socket.emit('join_game', data);
+        }
+
+        document.getElementById('nickname').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                joinAs('player');
+            }
+        });
+    </script>
+</body>
+</html>
